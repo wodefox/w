@@ -3,7 +3,7 @@ setlocal
 
 :parse_args
 if "%1"=="" (
-    echo Usage: w.bat [-ip] [-a] [-w] [-b] [-c] [-d] [-e] [-f] [-g] [-h] [-i] [-j] [-k] [-l] [-m] [-n] [-cc] [-cv] [-x] [-v] [-o] [-all]
+    echo Usage: w.bat [-ip] [-a] [-w] [-b] [-c] [-d] [-e] [-f] [-g] [-h] [-i] [-j] [-k] [-l] [-m] [-n] [-cc] [-cv] [-x] [-v] [-o] [-all] [-kill]
     echo -ip: Display all IP configuration information.
     echo -a: Display system information.
     echo -w: Display all running processes.
@@ -26,6 +26,7 @@ if "%1"=="" (
     echo -v: View all files in the specified directory.
     echo -o: Display all available drives using fsutil fsinfo drives.
     echo -all: Execute all commands.
+    echo -kill: Kill a running process by name.
     goto :eof
 )
 
@@ -48,7 +49,7 @@ if "%1"=="-ip" (
 ) else if "%1"=="-g" (
     netstat -ano
 ) else if "%1"=="-h" (
-    echo Usage: w.bat [-ip] [-a] [-w] [-b] [-c] [-d] [-e] [-f] [-g] [-h] [-i] [-j] [-k] [-l] [-m] [-n] [-cc] [-cv] [-x] [-v] [-o] [-all]
+    echo Usage: w.bat [-ip] [-a] [-w] [-b] [-c] [-d] [-e] [-f] [-g] [-h] [-i] [-j] [-k] [-l] [-m] [-n] [-cc] [-cv] [-x] [-v] [-o] [-all] [-kill]
 ) else if "%1"=="-i" (
     net share
 ) else if "%1"=="-j" (
@@ -65,76 +66,88 @@ if "%1"=="-ip" (
     if "%2"=="" (
          echo Error: No source or destination path specified for -cc.
          goto :eof
-        ) else if "%3"=="" (
-         echo Error: No destination path specified for -cc.
-         goto :eof
-        ) else (
-         copy "%2" "%3"
-         if %errorlevel% equ 0 (
-             echo File copied successfully from %2 to %3.
-            ) else (
-             echo Failed to copy the file.
-            )
-        )
+          ) else if "%3"=="" (
+          echo Error: No destination path specified for -cc.
+          goto :eof
+          ) else (
+          copy "%2" "%3"
+          if %errorlevel% equ 0 (
+              echo File copied successfully from %2 to %3.
+              ) else (
+              echo Failed to copy the file.
+              )
+          )
 ) else if "%1"=="-cv" (
-    if "%2"=="" (
-         echo Error: No source or destination path specified for -cv.
-         goto :eof
-        ) else if "%3"=="" (
-         echo Error: No destination path specified for -cv.
-         goto :eof
-        ) else (
-         move "%2" "%3"
-         if %errorlevel% equ 0 (
-             echo File moved successfully from %2 to %3.
-            ) else (
-             echo Failed to move the file.
-            )
-        )
+     if "%2"=="" (
+          echo Error: No source or destination path specified for -cv.
+          goto :eof
+          ) else if "%3"=="" (
+          echo Error: No destination path specified for -cv.
+          goto :eof
+          ) else (
+          move "%2" "%3"
+          if %errorlevel% equ 0 (
+              echo File moved successfully from %2 to %3.
+              ) else (
+              echo Failed to move the file.
+              )
+          )
 ) else if "%1"=="-x" (
-    if "%2"=="" (
-         echo Error: No file path specified for -x.
-         goto :eof
-        ) else (
-         echo %3 > "%2"
-         if %errorlevel% equ 0 (
-             echo File created and content written successfully to %2.
-            ) else (
-             echo Failed to create the file or write content.
-            )
-        )
+     if "%2"=="" (
+          echo Error: No file path specified for -x.
+          goto :eof
+          ) else (
+          echo %3 > "%2"
+          if %errorlevel% equ 0 (
+              echo File created and content written successfully to %2.
+              ) else (
+              echo Failed to create the file or write content.
+              )
+          )
 ) else if "%1"=="-v" (
-    if "%2"=="" (
-         echo Error: No directory path specified for -v.
-         goto :eof
-        ) else (
-         dir "%2"
-         if %errorlevel% equ 0 (
-             echo Directory contents listed successfully for %2.
-            ) else (
-             echo Failed to list directory contents.
-            )
-        )
+     if "%2"=="" (
+          echo Error: No directory path specified for -v.
+          goto :eof
+          ) else (
+          dir "%2"
+          if %errorlevel% equ 0 (
+              echo Directory contents listed successfully for %2.
+              ) else (
+              echo Failed to list directory contents.
+              )
+          )
 ) else if "%1"=="-o" (
-    fsutil fsinfo drives
+     fsutil fsinfo drives
 ) else if "%1"=="-all" (
-    ipconfig /all
-    systeminfo
-    tasklist
-    sc query
-    schtasks /query /fo list /v
-    net statistics workstation
-    net user
-    net localgroup administrators
-    netstat -ano
-    wmic share get name,path,status
-    route print
-    arp -a
-    whoami /all
-    net config workstation
-    fsutil fsinfo drives
+     ipconfig /all
+     systeminfo
+     tasklist
+     sc query
+     schtasks /query /fo list /v
+     net statistics workstation
+     net user
+     net localgroup administrators
+     netstat -ano
+     wmic share get name,path,status
+     route print
+     arp -a
+     whoami /all
+     net config workstation
+     fsutil fsinfo drives
+) else if "%1"=="-kill" (
+     if "%2"=="" (
+          echo Error: No process name specified for -kill.
+          goto :eof
+          ) else (
+          taskkill /F /IM %2
+          if %errorlevel% equ 0 (
+              echo Process %2 has been terminated.
+              ) else (
+              echo Failed to terminate process %2.
+              )
+          )
 ) else (
-    echo Unknown argument: %1
+     echo Unknown argument: %1
 )
 
 shift
