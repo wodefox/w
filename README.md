@@ -36,4 +36,3 @@ w.exe D:\txt\sss\
 ## 五、联系与反馈
 若使用中遇到问题或需功能建议，可通过以下方式反馈：
 - 开发者邮箱：[wodefox@yeah.net]
-- 项目仓库：[https://github.com/wodefox/w]
